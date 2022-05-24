@@ -12,6 +12,7 @@ import * as SplashScreen from 'expo-splash-screen';
 
 import Navigation from 'Navigation';
 import 'config/corejs';
+import { Profiler } from 'config/sentryPlatform';
 
 const theme = {
   ...DefaultTheme,
@@ -43,7 +44,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function App() {
+function App() {
   const { height: minHeight } = useWindowDimensions();
 
   const [appIsReady, setAppIsReady] = useState(false);
@@ -99,3 +100,5 @@ export default function App() {
     </Provider>
   );
 }
+
+export default Profiler(App);

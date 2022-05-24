@@ -4,7 +4,7 @@ import isEmpty from 'lodash.isempty';
 import React, { useCallback, useMemo } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
-import { View, useWindowDimensions, FlatList } from 'react-native';
+import { View, useWindowDimensions, FlatList, Platform } from 'react-native';
 import { Container } from '@monkvision/ui';
 import { useMediaQuery } from 'react-responsive';
 import { ActivityIndicator, Button, Card, List, Surface, useTheme } from 'react-native-paper';
@@ -15,6 +15,7 @@ import useGetInspection from 'screens/Landing/useGetInspection';
 
 import * as names from 'screens/names';
 import styles from './styles';
+import useSentry from '../../hooks/useSentry';
 
 const LIST_ITEMS = [{
   value: 'vinNumber',
@@ -52,6 +53,7 @@ export default function Landing() {
   const navigation = useNavigation();
   const { isAuthenticated } = useAuth();
   const { height } = useWindowDimensions();
+  const { captureException } = useSentry();
 
   const isPortrait = useMediaQuery({ query: '(orientation: portrait)' });
 
@@ -86,7 +88,14 @@ export default function Landing() {
       ? <ActivityIndicator color="white" size={16} style={styles.listLoading} />
       : <List.Icon icon={ICON_BY_STATUS[task?.status] || 'chevron-right'} />);
 
-    const handlePress = () => handleListItemPress(value);
+    const handlePress = () => {
+      try {
+        throw new Error('Dummy Error');
+      } catch (e) {
+        captureException(e, 'upload');
+      }
+    };
+    // const handlePress = () => handleListItemPress(value);
     const status = task?.status ? STATUSES[task.status] : description;
 
     return (
